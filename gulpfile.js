@@ -8,20 +8,14 @@ const del = require('del');
 const browserSync = require('browser-sync').create();
 
 const scssFiles = './src/scss/*.scss';
-const cssFiles = './src/scss/css/*.css';
 const jsFiles = './src/js/*.js';
-const index = './src/*html';
+const index = './src/*.html';
 
 
 function css(){
     return gulp.src(scssFiles)
         .pipe(sass())
         .pipe(gulp.dest('./src/scss/css'))
-}
-
-
-function transformMoveCSS() {
-    return gulp.src(cssFiles)
         .pipe(concat('style.css'))
         .pipe(autoprefixer({
             browsers: ['last 2 versions'],
@@ -29,7 +23,7 @@ function transformMoveCSS() {
         }))
         .pipe(cleanCSS({level: 2}))
         .pipe(gulp.dest('./build/css'))
-        .pipe(browserSync.stream());
+        .pipe(browserSync.stream({stream:true}));
 }
 
 function script() {
@@ -38,8 +32,8 @@ function script() {
         .pipe(uglify({
             toplevel:true
         }))
-        .pipe(gulp.dest('/build/js'))
-        .pipe(browserSync.stream());
+        .pipe(gulp.dest('./build/js'))
+        .pipe(browserSync.stream({stream:true}));
 }
 
 
@@ -47,7 +41,7 @@ function main(){
     return gulp.src(index)
         .pipe(concat('index.html'))
         .pipe(gulp.dest('./build'))
-        .pipe(browserSync.reload);
+        .pipe(browserSync.reload({stream:true}));
 }
 
 function clean(){
@@ -60,15 +54,16 @@ function watch(){
             baseDir: "./build"
         }
     });
-    gulp.watch('/src/scss/*.scss', gulp.series(css, transformMoveCSS));
-    gulp.watch('/src/js/*.js', script);
-    gulp.watch('/src/*.html').on('change', browserSync.reload);
+    gulp.watch('./src/scss/*.scss', css);
+    gulp.watch('./src/js/*.js', script);
+    gulp.watch('./src/*.html', main).on('change', browserSync.reload);
 }
 
-gulp.task('styles', gulp.series(css, transformMoveCSS));
+
+gulp.task('styles', css);
 gulp.task('script', script);
 gulp.task('main', main);
 gulp.task('del', clean);
 gulp.task('watch', watch);
-gulp.task('build', gulp.series(clean, gulp.series(css, transformMoveCSS), gulp.parallel(script, main)));
+gulp.task('build', gulp.series(clean, css, gulp.parallel(script, main)));
 gulp.task('dev', gulp.series('build', 'watch'));

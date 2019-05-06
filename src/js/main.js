@@ -1,1 +1,1 @@
-console.log(multiple(4, 2));
+alert("Conected!");
