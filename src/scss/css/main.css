@@ -1,12 +1,10 @@
-html{
+html {
   display: flex;
-  flex-direction: column;
-}
+  flex-direction: column; }
 
-body{
+body {
   margin: 0;
   padding: 0 15px;
   display: flex;
   flex-direction: column;
-  flex: auto;
-}
+  flex: auto; }
